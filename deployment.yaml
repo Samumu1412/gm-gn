@@ -17,14 +17,10 @@ spec:
       - name: gmgn
         # Replace $LOCATION with your Artifact Registry location (e.g., us-west1).
         # Replace $GCLOUD_PROJECT with your project ID.
-        image: asia-east1-docker.pkg.dev/smm-price-bot/gmgn/gmgn:1.0.3
+        image: asia-east1-docker.pkg.dev/smm-price-bot/gmgn/gmgn:1.0.5
         # This app listens on port 8080 for web traffic by default.
         ports:
         - containerPort: 8080
         env:
           - name: PORT
             value: "8080"
-          - name: DISCORD_CLIENT_TOKEN
-            value: "OTUwMzAzMTkzNjI2MTg1NzM4.YiW80Q.Erpo_eTFkh4MyEg0Df3agik9mbo"
-          - name: FIREBASE_REALTIMEDB_URL
-            value: "https://gmgn-f5194-default-rtdb.firebaseio.com/"

@@ -34,9 +34,23 @@ client.on('messageCreate', (msg) => {
   if(isAdmin && startsWith(command, prefix)) {
     switch (toLower(command)) {
       case `${prefix}adminhelp`: {
-        msg.channel.send(`1. !setRule : 新增檢查規則\n2. !showRule : 顯示當前運作規則\n3. !deleteRule : 刪除運作中規則
-        > !setRule\n\`\`\`!setRule {mode} {greeting} {days} {roleID}\n\n- {mode}: A/B (A: continuous / B: accumulate)\n- {greeting}: detect word\n- {days}: day counting\n- {roleID}: the ID of the role\`\`\`
-        > !deleteRule\n\`\`\`!deleteRule {ruleID}\n\n- {ruleID}: find the id by !showRule command\`\`\``)
+        msg.channel.send(`1. ${prefix}setRule : 新增檢查規則\n2. ${prefix}showRule : 顯示當前運作規則\n3. ${prefix}deleteRule : 刪除運作中規則\n4. ${prefix}setFeedback : 增加獲得身份組回饋\n5. ${prefix}showFeedback : 顯示當前身份組回饋\n6. ${prefix}deleteFeedback : 刪除特定身份組回饋
+        > ${prefix}setRule\n\`\`\`${prefix}setRule {mode} {greeting} {days} {roleID}\n\n- {mode}: A/B (A: continuous / B: accumulate)\n- {greeting}: detect word\n- {days}: day counting\n- {roleID}: the ID of the role\`\`\`
+        > ${prefix}deleteRule\n\`\`\`${prefix}deleteRule {ruleID}\n\n- {ruleID}: find the id by ${prefix}showRule command\`\`\`
+        > ${prefix}setFeedback\n\`\`\`${prefix}setFeedback {greeting} {feedback}\n\n- {greeting}: detect word\n- {feedback}: feedback for getting role\`\`\`
+        > ${prefix}deleteFeedback\n\`\`\`${prefix}deleteFeedback {greeting}\n\n- {greeting}: delete all feedbacks setup in {greeting}\`\`\``)
+        break
+      }
+      case `${prefix}setfeedback`: {
+        GMGN.setFeedback(msg)
+        break
+      }
+      case `${prefix}showfeedback`: {
+        GMGN.showFeedback(msg)
+        break
+      }
+      case `${prefix}deletefeedback`: {
+        GMGN.deleteFeedback(msg)
         break
       }
       case `${prefix}setrule`: {
@@ -53,7 +67,7 @@ client.on('messageCreate', (msg) => {
         break
       }
       default:
-        console.log('Please check ^adminHelp with correct command')
+        msg.channel.send(`Please check ${prefix}adminHelp with correct command`)
         break
     }
   }
