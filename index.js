@@ -1,9 +1,11 @@
 const { Client, Intents } = require('discord.js')
-const { startsWith, toLower, split } = require('lodash')
+const { toLower, split, values, includes, map, startsWith, toNumber } = require('lodash')
 require('dotenv').config()
 const { initializeApp } = require('firebase/app')
-const GMGN = require('./gmgn')
+const { getDatabase, ref, set, onValue } = require('firebase/database')
+const axios = require('axios')
 
+const GMGN = require('./gmgn')
 const { prefix } = require('./constants')
 
 const client = new Client({
@@ -26,26 +28,52 @@ client.on('messageCreate', (msg) => {
   }
 
   const [command] = split(msg.content, ' ', 1)
+  const db = getDatabase()
+  const isAdmin = msg.member.permissions.has("ADMINISTRATOR")
 
-  switch (toLower(command)) {
-    case `${prefix}help`: {
-      msg.channel.send(`Command List\nGM: Type gm continously\nGN: Type gn continously`)
-      break
-    }
-    case `gm`: {
-      GMGN.greet(msg)
-      break
-    }
-    case `gn`: {
-      GMGN.greet(msg)
-      break
-    }
-    default: {
-      msg.channel.send(
-        `${msg.content} is not a valid commad. Type ${prefix}help to see how to play.`
-      )
+  if(isAdmin && startsWith(command, prefix)) {
+    switch (toLower(command)) {
+      case `${prefix}adminhelp`: {
+        msg.channel.send(`1. !setRule : 新增檢查規則\n2. !showRule : 顯示當前運作規則\n3. !deleteRule : 刪除運作中規則
+        > !setRule\n\`\`\`!setRule {mode} {greeting} {days} {roleID}\n\n- {mode}: A/B (A: continuous / B: accumulate)\n- {greeting}: detect word\n- {days}: day counting\n- {roleID}: the ID of the role\`\`\`
+        > !deleteRule\n\`\`\`!deleteRule {ruleID}\n\n- {ruleID}: find the id by !showRule command\`\`\``)
+        break
+      }
+      case `${prefix}setrule`: {
+        GMGN.setRule(msg)
+        break
+      }
+      case `${prefix}showrule`: {
+        GMGN.
+        showRule(msg)
+        break
+      }
+      case `${prefix}deleterule`: {
+        GMGN.deleteRule(msg)
+        break
+      }
+      default:
+        console.log('Please check ^adminHelp with correct command')
+        break
     }
   }
+  onValue(
+    ref(db, `${msg.guild.id}/config`),
+    (snapshot) => {
+      const rules = map(
+        values(snapshot.val()),
+        'greeting'
+      )
+
+      if(toLower(command) === `${prefix}help`) {
+        msg.channel.send(`Command List\n`)
+      }
+
+      if(includes(rules, toLower(command))) {
+        GMGN.greet(msg)
+      }
+    }, {onlyOnce: true}
+  )
 
 })
 
