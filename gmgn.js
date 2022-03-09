@@ -1,5 +1,5 @@
 const { getDatabase, ref, set, onValue } = require('firebase/database')
-const { values, keys, takeRight, includes, map, compact, split, forEach, isNil, toNumber, add, concat, toLower } = require('lodash')
+const { values, keys, takeRight, includes, map, compact, split, forEach, isNil, toNumber, add, concat, toLower, join, random } = require('lodash')
 const { MessageEmbed } = require('discord.js')
 
 function getFormatedTime(date) {
@@ -71,7 +71,16 @@ function greet(msg) {
                                 roleID,
                                 userIDs: concat(usersHaveRole, msg.author.id)
                               })
-                              msg.channel.send(`You have been added to ROLE <@&${roleID}>`)
+                              onValue(ref(db, `${msg.guild.id}/feedback/${greeting}/`),
+                                (feedbackArray) => {
+                                  if(feedbackArray.exists()) {
+                                    const feedbacks = feedbackArray.val()
+                                    msg.channel.send(`You have been added to ROLE <@&${roleID}>. ${feedbacks[random(0, feedbacks.length)]}`)
+                                  } else {
+                                    msg.channel.send(`You have been added to ROLE <@&${roleID}>.`)
+                                  }
+                                }
+                              )
                             }
                           } else {
                             recordUserRole({
@@ -79,7 +88,16 @@ function greet(msg) {
                               roleID,
                               userIDs: [msg.author.id]
                             })
-                            msg.channel.send(`You have been added to ROLE <@&${roleID}>`)
+                            onValue(ref(db, `${msg.guild.id}/feedback/${greeting}/`),
+                              (feedbackArray) => {
+                                if(feedbackArray.exists()) {
+                                  const feedbacks = feedbackArray.val()
+                                  msg.channel.send(`You have been added to ROLE <@&${roleID}>. ${feedbacks[random(0, feedbacks.length)]}`)
+                                } else {
+                                  msg.channel.send(`You have been added to ROLE <@&${roleID}>.`)
+                                }
+                              }
+                            )
                           }
                         }, {onlyOnce: true}
                       )
@@ -113,7 +131,16 @@ function greet(msg) {
                               roleID,
                               userIDs: concat(usersHaveRole, msg.author.id)
                             })
-                            msg.channel.send(`You have been added to ROLE <@&${roleID}>`)
+                            onValue(ref(db, `${msg.guild.id}/feedback/${greeting}/`),
+                              (feedbackArray) => {
+                                if(feedbackArray.exists()) {
+                                  const feedbacks = feedbackArray.val()
+                                  msg.channel.send(`You have been added to ROLE <@&${roleID}>. ${feedbacks[random(0, feedbacks.length)]}`)
+                                } else {
+                                  msg.channel.send(`You have been added to ROLE <@&${roleID}>.`)
+                                }
+                              }
+                            )
                           }
                         } else {
                           recordUserRole({
@@ -121,7 +148,16 @@ function greet(msg) {
                             roleID,
                             userIDs: [msg.author.id]
                           })
-                          msg.channel.send(`You have been added to ROLE <@&${roleID}>`)
+                          onValue(ref(db, `${msg.guild.id}/feedback/${greeting}/`),
+                            (feedbackArray) => {
+                              if(feedbackArray.exists()) {
+                                const feedbacks = feedbackArray.val()
+                                msg.channel.send(`You have been added to ROLE <@&${roleID}>. ${feedbacks[random(0, feedbacks.length)]}`)
+                              } else {
+                                msg.channel.send(`You have been added to ROLE <@&${roleID}>.`)
+                              }
+                            }
+                          )
                         }
                       }, {onlyOnce: true}
                     )
@@ -197,6 +233,26 @@ function deleteRule(msg) {
   deleteConfig(msg.guild.id, configID)
 }
 
+function setFeedback(msg) {
+  const [_, greeting, ...feedbackArray] = split(toLower(msg.content), ' ')
+  const feedBacks = join(feedbackArray, ' ')
+  const db = getDatabase()
+
+  onValue(
+    ref(db, `${msg.guild.id}/feedback/${greeting}/`),
+    (snapshot) => {
+      if (snapshot.exists()) {
+        const greetingHaveFeedback = snapshot.val()
+        set(ref(db, `${msg.guild.id}/feedback/${greeting}/`), concat(greetingHaveFeedback, feedBacks))
+        msg.channel.send(`You have add feedback for \'${greeting}\'`)
+      } else {
+        set(ref(db, `${msg.guild.id}/feedback/${greeting}/`), [feedBacks])
+        msg.channel.send(`You have add feedback for \'${greeting}\'`)
+      }
+    }, {onlyOnce: true}
+  )
+}
+
 function recordUserMessage(data) {
   const db = getDatabase()
   set(ref(db, `${data.serverID}/${data.greeting}/${getFormatedTime(new Date())}/${data.userID}/`), {
@@ -231,4 +287,5 @@ module.exports = {
   setRule,
   showRule,
   deleteRule,
+  setFeedback,
 }

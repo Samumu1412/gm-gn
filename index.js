@@ -39,6 +39,10 @@ client.on('messageCreate', (msg) => {
         > !deleteRule\n\`\`\`!deleteRule {ruleID}\n\n- {ruleID}: find the id by !showRule command\`\`\``)
         break
       }
+      case `${prefix}setfeedback`: {
+        GMGN.setFeedback(msg)
+        break
+      }
       case `${prefix}setrule`: {
         GMGN.setRule(msg)
         break
@@ -53,7 +57,7 @@ client.on('messageCreate', (msg) => {
         break
       }
       default:
-        console.log('Please check ^adminHelp with correct command')
+        msg.channel.send('Please check ^adminHelp with correct command')
         break
     }
   }

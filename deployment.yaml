@@ -24,7 +24,3 @@ spec:
         env:
           - name: PORT
             value: "8080"
-          - name: DISCORD_CLIENT_TOKEN
-            value: "OTUwMzAzMTkzNjI2MTg1NzM4.YiW80Q.Erpo_eTFkh4MyEg0Df3agik9mbo"
-          - name: FIREBASE_REALTIMEDB_URL
-            value: "https://gmgn-f5194-default-rtdb.firebaseio.com/"
